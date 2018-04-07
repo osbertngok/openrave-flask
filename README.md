@@ -6,9 +6,19 @@ docker pull osbertngok/openrave
 docker run -it osbertngok/openrave openrave.py --example hanoi
 ```
 
+To recreate the docker image, simply run
+```
+docker build -t openrave ./docker/openrave
+```
+
 # Python RESTful API for OpenRave Scene Management
 
 ## Usage and Requirements:
+
+To recreate the docker image, simply run
+```
+docker build -t openrave-flask ./docker/openrave-flask
+```
 
 ### Method 1: Local
 * localhost:27017 mongo for storage (`docker pull mongo:latest && docker run -p 27017:27017 -t openrave_mongo mongo` would suffice

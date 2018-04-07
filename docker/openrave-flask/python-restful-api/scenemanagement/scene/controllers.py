@@ -4,6 +4,8 @@ import bson.json_util
 import json
 import datetime
 import os
+from os import listdir
+from os.path import isfile, join
 import openravepy
 
 bp = Blueprint('bp', __name__)
@@ -21,7 +23,9 @@ def scene_parser(file_path, filename):
         with env:
             for body in env.GetBodies():
                 item = {
-                    "name": body.GetName()
+                    "name": body.GetName(),
+                    "is_robot": body.IsRobot(),
+                    "dof": body.GetDOF() if body.IsRobot() else None
                 }
                 ret['bodies'].append(item)
     except openravepy.openrave_exception as e:
@@ -36,6 +40,9 @@ def scene_filename_handler(filename):
         return bson.json_util.dumps(selected_scene)
     if request.method == 'DELETE':
         current_app.collection.delete_one({"filename": filename})
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+        if isfile(join(UPLOAD_FOLDER, filename)):
+            os.remove(join(UPLOAD_FOLDER, filename))
         return '{"success": true}'
 
 
@@ -59,11 +66,15 @@ def scenes_handler():
     if request.method == 'GET':
         retrieved_scenes = []
         for scene in current_app.collection.find():
-            retrieved_scenes.append(scene)
+            retrieved_scenes.append(json.loads(bson.json_util.dumps(scene)))
         return json.dumps(retrieved_scenes)
     if request.method == 'DELETE':
         if current_app.config['TESTING']:
             current_app.collection.delete_many({})
+            UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+            for f in listdir(UPLOAD_FOLDER):
+                if isfile(join(UPLOAD_FOLDER, f)):
+                    os.remove(join(UPLOAD_FOLDER, f))
             return json.dumps({"success": True})
         else:
             return json.dumps({"success": False, "error": "Not in test environment"})

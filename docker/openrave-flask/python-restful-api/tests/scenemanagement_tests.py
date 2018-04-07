@@ -3,8 +3,7 @@ testdir = os.path.dirname(__file__)
 srcdir = '../'
 sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 
-from os import listdir
-from os.path import isfile, join
+from os.path import join
 import json
 
 from scenemanagement import factory
@@ -25,10 +24,6 @@ class OpenRaveTestCase(unittest.TestCase):
         self.client= app.test_client()
 
     def tearDown(self):
-        UPLOAD_FOLDER = self.app.config['UPLOAD_FOLDER']
-        for f in listdir(UPLOAD_FOLDER):
-            if isfile(join(UPLOAD_FOLDER, f)):
-                os.remove(join(UPLOAD_FOLDER, f))
         rv = self.client.delete('/scenes')
         assert 200 == rv.status_code
         assert b'{"success": true}' in rv.data
@@ -55,6 +50,68 @@ class OpenRaveTestCase(unittest.TestCase):
         ret = rv.data.decode("utf-8")
         dic = json.loads(ret)
         assert len(dic['bodies']) == 9
+
+    def test_duplicate_upload(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        hanoi_file_path = join(dir_path, 'test_files/hanoi.env.xml')
+        in_file = open(hanoi_file_path, "rb")  # opening for [r]eading as [b]inary
+        bin_data = in_file.read()
+        data = dict(
+          file=(io.BytesIO(bin_data), "hanoi.env.xml"),
+        )
+
+        rv = self.client.post('/scenes', content_type='multipart/form-data', data=data)
+        assert 200 == rv.status_code
+        assert b'{"success": true, "filename": "hanoi.env.xml"}' in rv.data
+
+        data = dict(
+            file=(io.BytesIO(bin_data), "hanoi.env.xml"),
+        )
+
+        rv = self.client.post('/scenes', content_type='multipart/form-data', data=data)
+        assert 400 == rv.status_code
+        assert b'{"success": false, "error": "file already exists"}' in rv.data
+
+    def test_get_data(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        hanoi_file_path = join(dir_path, 'test_files/hanoi.env.xml')
+        in_file = open(hanoi_file_path, "rb")  # opening for [r]eading as [b]inary
+        bin_data = in_file.read()
+        data = dict(
+            file=(io.BytesIO(bin_data), "hanoi.env.xml"),
+        )
+
+        rv = self.client.post('/scenes', content_type='multipart/form-data', data=data)
+
+        rv = self.client.get('/scenes/hanoi.env.xml')
+        assert 200 == rv.status_code
+        ret = rv.data.decode("utf-8")
+        dic = json.loads(ret)
+        assert len(dic['bodies']) == 9
+        print(dic['createdDateTime'])
+        assert dic['filename'] == 'hanoi.env.xml'
+        assert dic['bodies'][0]['is_robot'] is True
+        assert dic['bodies'][0]['name'] == 'Puma'
+
+    def test_delete_data(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        hanoi_file_path = join(dir_path, 'test_files/hanoi.env.xml')
+        in_file = open(hanoi_file_path, "rb")  # opening for [r]eading as [b]inary
+        bin_data = in_file.read()
+        data = dict(
+            file=(io.BytesIO(bin_data), "hanoi.env.xml"),
+        )
+
+        self.client.post('/scenes', content_type='multipart/form-data', data=data)
+
+        rv = self.client.get('/scenes/hanoi.env.xml')
+        assert 200 == rv.status_code
+        assert 'null' != rv.data.decode('utf-8')
+        rv = self.client.delete('/scenes/hanoi.env.xml')
+        assert 200 == rv.status_code
+        rv = self.client.get('/scenes/hanoi.env.xml')
+        assert 200 == rv.status_code
+        assert 'null' == rv.data.decode('utf-8')
 
     def test_empty_collection(self):
         rv = self.client.get('/scenes')

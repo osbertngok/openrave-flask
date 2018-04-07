@@ -1,0 +1,17 @@
+version: '3'
+services:
+  flask:
+    image: openrave-flask
+    container_name: or_flask
+    environment:
+      UPLOAD_FOLDER: "/opt/openrave-flask/upload"
+    ports:
+      - "8080:5000"
+    volumes:
+      - ./data/openrave-flask/upload:/opt/openrave-flask/upload
+  mongo:
+    image: mongo
+    container_name: or_mongo
+    volumes:
+      - ./log/mongodb:/var/log/mongodb
+      - ./data/mongodb:/data/db

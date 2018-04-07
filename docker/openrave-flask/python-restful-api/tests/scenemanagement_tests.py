@@ -88,7 +88,6 @@ class OpenRaveTestCase(unittest.TestCase):
         ret = rv.data.decode("utf-8")
         dic = json.loads(ret)
         assert len(dic['bodies']) == 9
-        print(dic['createdDateTime'])
         assert dic['filename'] == 'hanoi.env.xml'
         assert dic['bodies'][0]['is_robot'] is True
         assert dic['bodies'][0]['name'] == 'Puma'

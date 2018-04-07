@@ -14,7 +14,7 @@ RUN apt -y install git cmake build-essential libboost-dev libboost-thread-dev li
     apt -y install pkg-config python-dev libqt4-dev libsoqt4-dev libpcre3-dev xvfb python-pip && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install numpy
+RUN pip install scipy numpy
 
 RUN cd /tmp && \
     git clone --depth=1 --branch sympy-0.7.5 https://github.com/sympy/sympy.git && \
@@ -39,7 +39,7 @@ RUN cd /tmp && \
     git checkout -qf master && \
     mkdir build && \
     cd build && \
-    cmake -OPT_VIDEORECORDING=OFF -OPT_PLUGINS=OFF -OPT_DOUBLE_PRECISION=OFF -OPT_ACCURATEMATH=OFF -OPT_PYTHON=ON -OPT_OCTAVE=OFF -OPT_MATLAB=OFF -OPT_STATIC=OFF -OPT_COLLADA=ON -OPT_BULLET=OFF -OPT_ODE_COLLISION=OFF -OPT_FCL_COLLISION=OFF ../ && \
+    cmake -OPT_VIDEORECORDING=OFF -OPT_PLUGINS=OFF -OPT_DOUBLE_PRECISION=ON -OPT_ACCURATEMATH=ON -OPT_PYTHON=ON -OPT_OCTAVE=OFF -OPT_MATLAB=OFF -OPT_STATIC=OFF -OPT_COLLADA=ON -OPT_BULLET=OFF -OPT_ODE_COLLISION=OFF -OPT_FCL_COLLISION=OFF ../ && \
     make -j4 && \
     make install && \
     rm -rf /tmp/openrave

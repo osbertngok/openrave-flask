@@ -5,13 +5,12 @@ MAINTAINER osbertngok<osbertngok@gmail.com>
 # Is this required?
 # ENV PYTHONPATH=$PYTHONPATH:`openrave-config --python-dir`
 
+RUN pip install flask pymongo
 RUN mkdir -p /opt/openrave-flask/upload
 RUN mkdir /python-restful-api
-COPY python-restful-api /python-restful-api
-
-RUN pip install flask
-
 EXPOSE 5000
+
+COPY python-restful-api /python-restful-api
 
 ENTRYPOINT ["python", "/python-restful-api/app.py"]
 

@@ -8,10 +8,11 @@ def create_app(config=None):
 
     app.config.update(dict(
         DATABASE='openrave',
+        MONGO_CONNECTION_STRING='mongodb://localhost:27017/'
     ))
     app.config.update(config or {})
 
-    app.client = MongoClient('mongodb://localhost:27017/')
+    app.client = MongoClient(app.config['MONGO_CONNECTION_STRING'])
     app.db = app.client[app.config['DATABASE']]
     app.collection = app.db['scenes']
 

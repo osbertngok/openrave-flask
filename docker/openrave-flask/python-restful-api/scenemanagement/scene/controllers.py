@@ -22,8 +22,24 @@ def scene_parser(file_path, filename):
         env.Load(file_path)
         with env:
             for body in env.GetBodies():
+                transform = body.GetTransform().tolist()
+                processed_transform = None
+                if len(transform) == 4:
+                    processed_transform = {
+                        "r1": transform[0],  # need confirmation on this
+                        "r2": transform[1],
+                        "r3": transform[2],
+                        "r4": transform[3]
+                    }
+                else:
+                    processed_transform = {
+                        "r1": transform[0],  # need confirmation on this
+                        "r2": transform[1],
+                        "r3": transform[2],
+                    }
                 item = {
                     "name": body.GetName(),
+                    "transform": processed_transform,
                     "is_robot": body.IsRobot(),
                     "dof": body.GetDOF() if body.IsRobot() else None
                 }

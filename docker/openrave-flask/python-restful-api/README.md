@@ -20,16 +20,16 @@ curl -X DELETE http://localhost:5000/scenes
 
 ### upload a scene:
 ```
-curl -F "file=@/path/to/scene_file" http://localhost:5000/scene
+curl -F "file=@/path/to/scene_file" http://localhost:5000/scenes
 ```
 
 ### get meta data of a scene
 ```
-curl http://localhost:5000/scene/<scene_file_name>
+curl http://localhost:5000/scenes/<scene_file_name>
 ```
 
 ### delete a scene
 ```
-curl -X DELETE http://localhost:5000/scene/<scene_file_name>
+curl -X DELETE http://localhost:5000/scenes/<scene_file_name>
 ```
 

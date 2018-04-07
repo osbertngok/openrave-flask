@@ -1,15 +1,23 @@
-# openrave docker
+# OpenRave Docker
 
 ## Usage
+```
 docker pull osbertngok/openrave
 docker run -it osbertngok/openrave openrave.py --example hanoi
+```
 
 # Python RESTful API for OpenRave Scene Management
 
-## Requirements
+## Usage and Requirements:
 
+### Method 1: Local
 * localhost:27017 mongo for storage (`docker pull mongo:latest && docker run -p 27017:27017 -t openrave_mongo mongo` would suffice
 * require python3 / flask
+* python ./docker/openrave-flask/python-restful-api/tests/scenemanagement_tests.py
+
+### Method 2: Docker
+* docker-compose -f ./docker/docker-compose.yml up -d
+* ./scripts/unittest.sh
 
 ## Examples:
 

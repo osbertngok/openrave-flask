@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 
 from os import listdir
 from os.path import isfile, join
+import json
 
 from scenemanagement import factory
 import unittest
@@ -37,13 +38,23 @@ class OpenRaveTestCase(unittest.TestCase):
         assert 404 == rv.status_code
 
     def test_upload(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        hanoi_file_path = join(dir_path, 'test_files/hanoi.env.xml')
+        in_file = open(hanoi_file_path, "rb")  # opening for [r]eading as [b]inary
+        bin_data = in_file.read()
         data = dict(
-          file=(io.BytesIO(b'{"a": "b"}'), "test_file_1"),
+          file=(io.BytesIO(bin_data), "hanoi.env.xml"),
         )
 
         rv = self.client.post('/scenes', content_type='multipart/form-data', data=data)
         assert 200 == rv.status_code
-        assert b'{"success": true, "filename": "test_file_1"}' in rv.data
+        assert b'{"success": true, "filename": "hanoi.env.xml"}' in rv.data
+
+        rv = self.client.get('/scenes/hanoi.env.xml')
+        assert 200 == rv.status_code
+        ret = rv.data.decode("utf-8")
+        dic = json.loads(ret)
+        assert len(dic['bodies']) == 9
 
     def test_empty_collection(self):
         rv = self.client.get('/scenes')

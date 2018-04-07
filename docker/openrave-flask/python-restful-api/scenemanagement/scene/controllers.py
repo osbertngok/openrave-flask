@@ -4,13 +4,29 @@ import bson.json_util
 import json
 import datetime
 import os
+import openravepy
 
 bp = Blueprint('bp', __name__)
 
 
-def scene_parser(file):
-    return {"createdDateTime": datetime.datetime.now(), "filename": file.filename,
-            "bodies": [{"name": "body1", "tranformation": "rotate", "robot": False}]}
+def scene_parser(file_path, filename):
+    ret = {
+        "createdDateTime": datetime.datetime.now(),
+        "filename": filename,
+        "bodies": []
+    }
+    try:
+        env = openravepy.Environment()
+        env.Load(file_path)
+        with env:
+            for body in env.GetBodies():
+                item = {
+                    "name": body.GetName()
+                }
+                ret['bodies'].append(item)
+    except openravepy.openrave_exception as e:
+        print(e)
+    return ret
 
 
 @bp.route('/scenes/<string:filename>', methods=['GET', 'DELETE'])
@@ -36,9 +52,9 @@ def scenes_handler():
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
         if os.path.exists(file_path):
             return json.dumps({"success": False, "error": "file already exists"}), 400
-        uploaded_scene = scene_parser(file)
-        inserted_id = current_app.collection.insert_one(uploaded_scene).inserted_id
         file.save(file_path)
+        uploaded_scene = scene_parser(file_path, file.filename)
+        inserted_id = current_app.collection.insert_one(uploaded_scene).inserted_id
         return json.dumps({"success": True, "filename": file.filename})
     if request.method == 'GET':
         retrieved_scenes = []

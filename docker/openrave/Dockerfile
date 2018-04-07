@@ -14,7 +14,7 @@ RUN apt -y install git cmake build-essential libboost-dev libboost-thread-dev li
     apt -y install pkg-config python-dev libqt4-dev libsoqt4-dev libpcre3-dev xvfb python-pip && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install scipy numpy
+RUN pip install numpy
 
 RUN cd /tmp && \
     git clone --depth=1 --branch sympy-0.7.5 https://github.com/sympy/sympy.git && \
@@ -35,6 +35,7 @@ RUN cd /tmp && \
 
 RUN cd /tmp && \
     git clone --depth=1 --branch master https://github.com/rdiankov/openrave.git && \
+    cd openrave && \
     git checkout -qf master && \
     mkdir build && \
     cd build && \

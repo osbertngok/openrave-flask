@@ -26,7 +26,7 @@ docker build -t openrave-flask ./docker/openrave-flask
 * python ./docker/openrave-flask/python-restful-api/tests/scenemanagement_tests.py
 
 ### Method 2: Docker
-* docker-compose -f ./docker/docker-compose.yml up -d
+* docker-compose up -d
 * ./scripts/unittest.sh
 
 ## Examples:
